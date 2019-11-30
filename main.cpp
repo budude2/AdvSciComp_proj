@@ -8,7 +8,7 @@ using namespace arma;
 
 int main(int argc, char *argv[])
 {
-    mat A = zeros<dmat>(2,3);
+    mat A = zeros<dmat>(2, 3);
 
     char * memblock;
     unsigned long size = 0;
@@ -41,18 +41,22 @@ int main(int argc, char *argv[])
         file.close();
     }
 
-    for(int x = 0; x < 2; x++)
+    for(int r = 0; r < 3; r++)
     {
-        for(int y = 0; y < 3; y++)
+        for(int c = 0; c < 2; c++)
         {
-            cout << double_values[y * 2 + x] << " ";
-            A(x,y) = double_values[y * 2 + x];
+            cout << double_values[r * 2 + c] << " ";
+            A(c, r) = double_values[r * 2 + c];
         }
         cout << "\n";
     }
 
     cout << "\n\n\n";
     A.print("A:");
+    cout << "\n\n\n";
+
+    cout << "A(2,2): " << A(1, 1) << endl;
+    cout << "A(1,2): " << A(0, 1) << endl;
     
     delete[] memblock;
 	return 0; 

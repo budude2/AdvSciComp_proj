@@ -1,5 +1,4 @@
 #include <fstream>
-#include <iostream>
 #include <cstring>
 
 using namespace std;
@@ -17,11 +16,8 @@ double readFile(const char * filename, double * double_values)
 
     if (file.is_open())
     {
-        cout << "File opened" << endl;
         // Get the size of the file in bytes
         size = file.tellg();
-
-        cout << size << endl;
 
         // Allocate the memory block, read the entire file, close the file.
         memblock = new char [size];
@@ -34,8 +30,9 @@ double readFile(const char * filename, double * double_values)
 
         file.close();
         delete[] memblock;
+
+        return 0;
     }
 
-    //return double_values;
-    return 0;
+    return -1;
 }

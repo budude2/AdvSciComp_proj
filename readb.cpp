@@ -1,10 +1,9 @@
-#include <iostream> 
+#include <iostream>
 #include <armadillo>
+#include "support.h"
 
-using namespace std; 
+using namespace std;
 using namespace arma;
-
-double readFile(const char *, double *);
 
 int main(int argc, char *argv[])
 {
@@ -32,7 +31,7 @@ int main(int argc, char *argv[])
 
     cout << "b(1,1): " << b(0, 0) << endl;
     cout << "b(2,1): " << b(1, 0) << endl;
-    
+
     free(double_values);
-	return 0; 
+	return 0;
 }

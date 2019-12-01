@@ -1,10 +1,9 @@
 #include <iostream>
 #include <armadillo>
+#include "support.h"
 
 using namespace std;
 using namespace arma;
-
-double readFile(const char *, double *);
 
 int main(int argc, char *argv[])
 {

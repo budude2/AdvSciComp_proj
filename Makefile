@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -g
-SRCS = main.cpp readFile.cpp
+SRCS = main.cpp readFile.cpp readA.cpp readb.cpp
 PROG = test
 
 BOOST = -lboost_filesystem -lboost_system

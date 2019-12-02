@@ -1,6 +1,6 @@
 CC = g++
-CFLAGS = -g
-SRCS = main.cpp
+CFLAGS = -O3 -march=native --std=c++14
+SRCS = main.cpp art.cpp
 PROG = test
 
 BOOST = -lboost_filesystem -lboost_system
@@ -8,13 +8,14 @@ ARMADILLO = -larmadillo
 LIBS = $(ARMADILLO)
 
 $(PROG):$(SRCS)
-			$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
+	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
+art_mp:
+	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS) -fopenmp -lopenblas
+art_nv:
+	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS) -lnvblas -lopenblas
 
-readA:
-	$(CC) $(CFLAGS) -o readA readA.cpp readFile.cpp $(LIBS)
-
-readb:
-	$(CC) $(CFLAGS) -o readb readb.cpp readFile.cpp $(LIBS)
+art:
+	$(CC) $(CFLAGS) -c art.cpp $(LIBS)
 
 clean:
-	rm test readA readb
+	rm test 

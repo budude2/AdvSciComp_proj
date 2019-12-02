@@ -18,6 +18,8 @@ int main(int argc, char *argv[])
     mat A = zeros<dmat>(rows_a, cols_a);
     mat b = zeros<dmat>(rows_b, cols_b);
 
+    mat x = zeros<dmat>(3, 1);
+
     readA(argv[1], A, rows_a, cols_a);
     readA(argv[4], b, rows_b, cols_b);
 
@@ -26,6 +28,11 @@ int main(int argc, char *argv[])
     cout << "\n\n\n";
     b.print("b:");
     cout << "\n\n\n";
+
+    x = solve(A,b);
+
+    x.print("x:");
+    cout << "\n\n\n" << endl;
 
 	return 0;
 }

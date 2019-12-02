@@ -20,8 +20,10 @@ int main(int argc, char *argv[])
 
     mat x = zeros<dmat>(3, 1);
 
-    readA(argv[1], A, rows_a, cols_a);
-    readA(argv[4], b, rows_b, cols_b);
+    A.load(argv[1]);
+    A.reshape(rows_a, cols_a);
+
+    b.load(argv[4]);
 
     cout << "\n\n\n";
     A.print("A:");

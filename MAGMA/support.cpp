@@ -36,3 +36,26 @@ void dfill_matrix_A_gpu(magma_int_t m, magma_int_t n, double *dA, magma_int_t ld
     magma_free_cpu(A);
 }
 
+
+void dfill_matrix_b_gpu(magma_int_t m, magma_int_t n, double *db, magma_int_t lddb, magma_queue_t queue)
+{
+    double *b;
+    magma_int_t ldb = lddb;
+    magma_dmalloc_cpu(&b, n*ldb);
+
+    if (b == NULL)
+    {
+        fprintf( stderr, "malloc failed\n" );
+        return;
+    }
+
+    cout << "Filling matrix" << endl;
+    readFile("b.bin", b);
+
+    cout << "Copying matrix to GPU" << endl;
+    magma_dsetmatrix(m, n, b, ldb, db, lddb, queue);
+    
+    cout << "Freeing CPU memory" << endl;
+    magma_free_cpu(b);
+}
+

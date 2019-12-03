@@ -23,15 +23,23 @@ int main(int argc, char *argv[])
 
     // Begin MAGMA stuff
     double *dA = nullptr;
+    double *db = nullptr;
 
     magma_int_t ldda = rows_a; // Might round up to 32 for GPU performance.
-    magma_queue_t queue = nullptr;
-    magma_dmalloc(&dA, ldda * cols_a); // Allocate memory on GPU
+    magma_int_t lddb = rows_b;
 
-    if (dA == nullptr)
+    magma_queue_t queue = nullptr;
+
+    magma_dmalloc(&dA, ldda * cols_a); // Allocate memory on GPU
+    magma_dmalloc(&db, lddb * cols_b);
+
+    if (dA == nullptr || db == nullptr)
     {
          cerr << "malloc failed" << endl;
+
+         magma_queue_destroy(queue);
          magma_free(dA);
+         magma_free(db);
          magma_finalize();
          return -1;
     }
@@ -40,8 +48,10 @@ int main(int argc, char *argv[])
     magma_queue_create(dev, &queue);
 
     dfill_matrix_A_gpu(rows_a, cols_a, dA, ldda, queue);
+    dfill_matrix_b_gpu(rows_b, cols_b, db, lddb, queue);
 
     magma_dprint_gpu(rows_a, cols_a, dA, ldda, queue);
+    magma_dprint_gpu(rows_b, cols_b, db, lddb, queue);
 
     //readA(argv[1], A, rows_a, cols_a);
     //readA(argv[4], b, rows_b, cols_b);

@@ -33,6 +33,7 @@ double readFile(const char * filename, double * double_values)
         file.close();
         delete[] memblock;
 
+        cout << "Done reading file" << endl;
         return 0;
     }
 

@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -ggdb -Wall
-SRCS = main.cpp readFile.cpp
+SRCS = main.cpp readFile.cpp support.cpp
 PROG = test
 
 ARMADILLO = -larmadillo

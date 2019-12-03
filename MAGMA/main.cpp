@@ -47,8 +47,8 @@ int main(int argc, char *argv[])
     magma_int_t dev = 0;
     magma_queue_create(dev, &queue);
 
-    dfill_matrix_A_gpu(rows_a, cols_a, dA, ldda, queue);
-    dfill_matrix_b_gpu(rows_b, cols_b, db, lddb, queue);
+    dfill_matrix_gpu(argv[1], rows_a, cols_a, dA, ldda, queue);
+    dfill_matrix_gpu(argv[4], rows_b, cols_b, db, lddb, queue);
 
     magma_dprint_gpu(rows_a, cols_a, dA, ldda, queue);
     magma_dprint_gpu(rows_b, cols_b, db, lddb, queue);

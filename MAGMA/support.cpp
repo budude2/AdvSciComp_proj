@@ -14,48 +14,26 @@ using namespace std;
 // ldda- leading dimension of the array, this is always rows.
 // queue- The queue to operate in.
 // ------------------------------------------------------------
-void dfill_matrix_A_gpu(magma_int_t m, magma_int_t n, double *dA, magma_int_t ldda, magma_queue_t queue)
-{
-    double *A;
-    magma_int_t lda = ldda;
-    magma_dmalloc_cpu(&A, n*lda);
 
-    if (A == NULL)
+void dfill_matrix_gpu(const char * fileName, magma_int_t m, magma_int_t n, double *dmatrix, magma_int_t lddmatrix, magma_queue_t queue)
+{
+    double *matrix;
+    magma_int_t ldmatrix = lddmatrix;
+    magma_dmalloc_cpu(&matrix, n*ldmatrix);
+
+    if (matrix == NULL)
     {
         fprintf( stderr, "malloc failed\n" );
         return;
     }
 
     cout << "Filling matrix" << endl;
-    readFile("A.bin", A);
+    readFile(fileName, matrix);
 
     cout << "Copying matrix to GPU" << endl;
-    magma_dsetmatrix(m, n, A, lda, dA, ldda, queue);
+    magma_dsetmatrix(m, n, matrix, ldmatrix, dmatrix, lddmatrix, queue);
     
     cout << "Freeing CPU memory" << endl;
-    magma_free_cpu(A);
-}
-
-
-void dfill_matrix_b_gpu(magma_int_t m, magma_int_t n, double *db, magma_int_t lddb, magma_queue_t queue)
-{
-    double *b;
-    magma_int_t ldb = lddb;
-    magma_dmalloc_cpu(&b, n*ldb);
-
-    if (b == NULL)
-    {
-        fprintf( stderr, "malloc failed\n" );
-        return;
-    }
-
-    cout << "Filling matrix" << endl;
-    readFile("b.bin", b);
-
-    cout << "Copying matrix to GPU" << endl;
-    magma_dsetmatrix(m, n, b, ldb, db, lddb, queue);
-    
-    cout << "Freeing CPU memory" << endl;
-    magma_free_cpu(b);
+    magma_free_cpu(matrix);
 }
 

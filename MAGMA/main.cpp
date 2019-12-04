@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "support.h"
 #include <cublas_v2.h>
 #include <magma_v2.h>
@@ -66,9 +67,7 @@ int main(int argc, char *argv[])
 
     magma_dprint_gpu(rows_c, cols_c, dc, lddc, queue);
 
-
-    //readA(argv[1], A, rows_a, cols_a);
-    //readA(argv[4], b, rows_b, cols_b);
+    writeGPUVectorFile("res.bin", 3, dc, queue);
 
     magma_queue_destroy(queue);
     magma_free(dA);

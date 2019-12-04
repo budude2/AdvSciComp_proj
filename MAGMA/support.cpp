@@ -1,5 +1,6 @@
 #include "support.h"
 #include <iostream>
+#include <fstream>
 #include <cublas_v2.h>
 #include <magma_v2.h>
 #include <magma_lapack.h>
@@ -60,4 +61,23 @@ void dfill_vector_gpu(const char * fileName, magma_int_t rows, double *dmatrix, 
     
     cout << "Freeing CPU memory" << endl;
     magma_free_cpu(matrix);
+}
+
+void writeGPUVectorFile(const char * filename, magma_int_t rows, double *dmatrix, magma_queue_t queue)
+{
+    ofstream outputFile;
+
+    double *outputVector;
+    magma_dmalloc_cpu(&outputVector, rows);
+
+    magma_getvector(rows, sizeof(double), dmatrix, 1, outputVector, 1, queue);
+
+    //magma_dprint(rows, 1, outputVector, rows);
+
+    outputFile.open(filename, ios::out | ios::binary);
+
+    outputFile.write(reinterpret_cast<char*>(outputVector), sizeof(double) * rows);
+    outputFile.close();
+
+    magma_free_cpu(outputVector);
 }

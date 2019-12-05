@@ -8,8 +8,8 @@
 
 using namespace std;
 
-//test A-filename, rows, cols, b-filename, rows
-//0    1           2     3     4           5
+//test A-filename, rows, cols, b-filename, rows, imsize
+//0    1           2     3     4           5     6
 int main(int argc, char *argv[])
 {
     magma_init();
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     /***************************
     * Set algorithm parameters *
     ***************************/
-    magma_int_t n_im = 2;
+    magma_int_t n_im = strtoul(argv[6], nullptr, 10);
     magma_int_t iterations = 3;
     double relax = 0.5;
 
@@ -96,16 +96,16 @@ int main(int argc, char *argv[])
     // Dummy x for testing
     //double x[4] = {5, 4, 3, 2};    
     //magma_setmatrix(rows_x, cols_x, sizeof(double), x, lddx, dx, lddx, queue); 
-    cout << "Initial x: " << endl;
-    magma_dprint_gpu(rows_x, cols_x, dx, lddx, queue);
+    //cout << "Initial x: " << endl;
+    //magma_dprint_gpu(rows_x, cols_x, dx, lddx, queue);
 
     /********************
     * Print for testing *
     ********************/
-    cout << "\nA: " << endl;
-    magma_dprint(rows_A, cols_A, A, ldA);
-    cout << "\nb: " << endl;
-    magma_dprint(rows_b, cols_b, b, ldb);
+    //cout << "\nA: " << endl;
+    //magma_dprint(rows_A, cols_A, A, ldA);
+    //cout << "\nb: " << endl;
+    //magma_dprint(rows_b, cols_b, b, ldb);
 
     /****************
     * Copy A to GPU *
@@ -184,17 +184,18 @@ int main(int argc, char *argv[])
                 * Calculate the new x *
                 **********************/
                 alpha = (relax * residual)/norm;
-                cout << "Alpha: " << alpha << endl;
+                //cout << "Alpha: " << alpha << endl;
                 //magma_dscal(cols_row, alpha, drow, 1, queue);
                 magma_daxpy(cols_row, alpha, drow, 1, dx, 1, queue);
             }
         }
     }
 
-    cout << "Final x: " << endl;
-    magma_dprint_gpu(rows_x, cols_x, dx, lddx, queue);
+    //cout << "Final x: " << endl;
+    //magma_dprint_gpu(rows_x, cols_x, dx, lddx, queue);
 
-    writeGPUVectorFile("res.bin", n_im * n_im, dx, queue);
+    cout << "Writing result..." << endl;
+    writeGPUVectorFile("x.bin", n_im * n_im, dx, queue);
     
     /******************
     * Free the memory *

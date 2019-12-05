@@ -8,8 +8,8 @@
 
 using namespace std;
 
-//test A-filename, rows, cols, b-filename, rows, imsize
-//0    1           2     3     4           5     6
+//test A-filename, rows, cols, b-filename, rows, imsize, iterations, relax
+//0    1           2     3     4           5     6       7           8
 int main(int argc, char *argv[])
 {
     magma_init();
@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
     * Set algorithm parameters *
     ***************************/
     magma_int_t n_im = strtoul(argv[6], nullptr, 10);
-    magma_int_t iterations = 3;
-    double relax = 0.5;
+    magma_int_t iterations = strtoul(argv[7], nullptr, 10);
+    double relax = stod(argv[8]);
 
     /****************************************************************
     *   This block loads in the sizes passed, and prints them out   *
@@ -30,8 +30,13 @@ int main(int argc, char *argv[])
     magma_int_t rows_b = strtoul(argv[5], nullptr, 10);
     magma_int_t cols_b = 1;
 
+    cout << "---------------Parameters---------------" << endl;
     cout << "A: " << rows_A << "x" << cols_A << endl;
     cout << "b: " << rows_b << "x" << cols_b << endl;
+    cout << "Image size: " << n_im << "x" << n_im << endl;
+    cout << "Iterations: " << iterations << endl;
+    cout << "Relax: " << relax << endl;
+    cout << "----------------------------------------" << endl;
 
     /******************
     * Setup the queue *
@@ -123,6 +128,9 @@ int main(int argc, char *argv[])
     *****************/
     magma_getmatrix(rows_AT, cols_AT, sizeof(double), dAT, lddAT, AT, ldAT, queue);
     //magma_dprint(rows_AT, cols_AT, AT, ldAT);
+    
+    magma_free(dA);
+    magma_free(dAT);
 
     /****************
     * Main ART loop *
@@ -200,8 +208,6 @@ int main(int argc, char *argv[])
     /******************
     * Free the memory *
     ******************/
-    magma_free(dA);
-    magma_free(dAT);
     magma_free(dx);
     magma_free(drow);
     magma_free_cpu(row);

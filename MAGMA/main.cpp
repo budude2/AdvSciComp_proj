@@ -69,11 +69,60 @@ int main(int argc, char *argv[])
 
     writeGPUVectorFile("res.bin", 3, dc, queue);
 
+    // Find the transpose of A
+    double *dAT;
+    magma_int_t lddAT = cols_a;
+    magma_dmalloc(&dAT, lddAT * rows_a);
+
+    magmablas_dtranspose(rows_a, cols_a, dA, ldda, dAT, lddAT, queue);
+
+    cout << "\nAT" << endl;
+    magma_dprint_gpu(cols_a, rows_a, dAT, lddAT, queue);
+
+    // Lets try grabbing a row on the CPU side
+    double *A;
+    magma_int_t ldA = lddAT;
+    magma_dmalloc_cpu(&A, ldA * rows_a);
+
+    magma_getmatrix(cols_a, rows_a, sizeof(double), dAT, lddAT, A, ldA, queue);
+
+    cout << "\nPrinting AT from CPU:" << endl;
+
+    magma_dprint(cols_a, rows_a, A, ldA);
+
+    cout << "\nLets try getting a row..." << endl;
+
+    double *R;
+    magma_dmalloc_cpu(&R, 3 * sizeof(double));
+    memcpy(R, A, 3 * sizeof(double));
+
+    magma_dprint(1, 3, R, 1);
+    cout << "We've got a row of A!" << endl;
+
+    memcpy(R, &A[3], 3 * sizeof(double));
+
+    magma_dprint(1, 3, R, 1);
+    cout << "We've got a row of A!" << endl;
+
+    memcpy(R, &A[6], 3 * sizeof(double));
+
+    magma_dprint(1, 3, R, 1);
+    cout << "We've got a row of A!" << endl;
+
+    memcpy(R, &A[9], 3 * sizeof(double));
+
+    magma_dprint(1, 3, R, 1);
+    cout << "We've got a row of A!" << endl;
+
+    free(R);
+
     magma_queue_destroy(queue);
     magma_free(dA);
     magma_free(db);
     magma_free(dc);
+    magma_free_cpu(A);
+    magma_free(dAT);
     magma_finalize();
-	return 0;
+    return 0;
 }
 

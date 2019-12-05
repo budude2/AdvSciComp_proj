@@ -8,7 +8,10 @@ MAGMA_LIBS := -L/usr/local/magma/lib/ -lmagma_sparse -lmagma -lcublas -lcudart -
 LIBS = $(MAGMA_LIBS)
 
 $(PROG):$(SRCS)
-			$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
+	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
+
+art:
+	$(CC) $(CFLAGS) -o art art.cpp readFile.cpp support.cpp $(LIBS)
 
 clean:
 	rm test

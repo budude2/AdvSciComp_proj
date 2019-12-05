@@ -4,6 +4,7 @@
 #include <cublas_v2.h>
 #include <magma_v2.h>
 #include <magma_lapack.h>
+#include <math.h>
 
 using namespace std;
 
@@ -12,6 +13,13 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     magma_init();
+
+    /***************************
+    * Set algorithm parameters *
+    ***************************/
+    magma_int_t n_im = 50;
+    magma_int_t iterations = 3;
+    double relax = 0.5;
 
     /****************************************************************
     *   This block loads in the sizes passed, and prints them out   *
@@ -51,19 +59,19 @@ int main(int argc, char *argv[])
     /*****************************
     * Setup the AT matrix on CPU *
     *****************************/
-    double *AT;
-    magma_int_t rows_AT = cols_A;
-    magma_int_t cols_AT = rows_A;
+    //double *AT;
+    //magma_int_t rows_AT = cols_A;
+    //magma_int_t cols_AT = rows_A;
 
-    magma_int_t ldAT = rows_AT;
-    magma_dmalloc_cpu(&AT, ldAT * cols_AT);
+    //magma_int_t ldAT = rows_AT;
+    //magma_dmalloc_cpu(&AT, ldAT * cols_AT);
 
     /*****************************
     * Setup the AT matrix on GPU *
     *****************************/
-    double *dAT;
-    magma_int_t lddAT = ldAT;
-    magma_dmalloc(&dAT, lddAT * cols_AT);
+    //double *dAT;
+    //magma_int_t lddAT = ldAT;
+    //magma_dmalloc(&dAT, lddAT * cols_AT);
 
     /****************************
     * Setup the b matrix on CPU *
@@ -73,6 +81,17 @@ int main(int argc, char *argv[])
     magma_dmalloc_cpu(&b, ldb * cols_b);
 
     readFile(argv[4], b);
+
+    /*********************
+    * Setup image vector *
+    *********************/
+    magma_int_t rows_x = n_im * n_im;
+    magma_int_t cols_x = 1;
+    magma_int_t lddx = rows_x;
+
+    double *dx = nullptr;
+    magma_dmalloc(&dx, lddx * cols_x);
+    magmablas_dlaset(MagmaFull, rows_x, cols_x, 0, 0, dx, lddx, queue);        
 
     /********************
     * Print for testing *
@@ -88,22 +107,36 @@ int main(int argc, char *argv[])
     /***************************
     * Attempt Transpose on GPU *
     ***************************/
-    magmablas_dtranspose(rows_A, cols_A, dA, lddA, dAT, lddAT, queue); 
-    magma_dprint_gpu(rows_AT, cols_AT, dAT, lddAT, queue);
+    //magmablas_dtranspose(rows_A, cols_A, dA, lddA, dAT, lddAT, queue); 
+    //magma_dprint_gpu(rows_AT, cols_AT, dAT, lddAT, queue);
 
     /*****************
     * Copy AT to CPU *
     *****************/
-    magma_getmatrix(rows_AT, cols_AT, sizeof(double), dAT, lddAT, AT, ldAT, queue);
-    magma_dprint(rows_AT, cols_AT, AT, ldAT);
+    //magma_getmatrix(rows_AT, cols_AT, sizeof(double), dAT, lddAT, AT, ldAT, queue);
+    //magma_dprint(rows_AT, cols_AT, AT, ldAT);
+
+    /***************************************
+    * Grab a row and take the 2 norm of it *
+    ***************************************/
+    double *r;
+    magma_dmalloc_cpu(&r, rows_A * sizeof(double));
+    memcpy(r, A, rows_A * sizeof(double));
+    magma_dprint(rows_A, 1, r, rows_A);
+
+    double norm;
+    norm = pow(magma_cblas_dnrm2(rows_A, r, 1), 2);
+    cout << "Norm: " << norm << endl;
 
     /******************
     * Free the memory *
     ******************/
-    magma_free(A);
-    magma_free(AT);
+    magma_free(dA);
+    //magma_free(dAT);
+    magma_free(dx);
+    magma_free_cpu(r);
     magma_free_cpu(A);
-    magma_free_cpu(AT);
+    //magma_free_cpu(AT);
     magma_free_cpu(b);
 
     return 0;

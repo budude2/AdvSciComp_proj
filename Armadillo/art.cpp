@@ -13,16 +13,13 @@ int ART(arma::Mat<double>& A, arma::Mat<double>& b, arma::Mat<double>& x0, unsig
 
     x.col(0) = x0;
 
-    cout << "A is: " << A.n_rows << "x" << A.n_cols << endl;
-    cout << "b is: " << b.n_rows << "x" << b.n_cols << endl;
-
     unsigned long iter = 0;
     unsigned long i = 0;
-    for(iter; iter < iterations; iter++)
+    for(iter = 0; iter < iterations; iter++)
     {
         xnext = x.col(iter); 
 
-        for(i; i < A.n_rows; i++)
+        for(i = 0; i < A.n_rows; i++)
         {
             double normAi;
             normAi = pow(norm(A.row(i)), 2);

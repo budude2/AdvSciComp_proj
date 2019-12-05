@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     /***************************
     * Set algorithm parameters *
     ***************************/
-    magma_int_t n_im = 50;
+    magma_int_t n_im = 2;
     magma_int_t iterations = 3;
     double relax = 0.5;
 
@@ -91,7 +91,12 @@ int main(int argc, char *argv[])
 
     double *dx = nullptr;
     magma_dmalloc(&dx, lddx * cols_x);
-    magmablas_dlaset(MagmaFull, rows_x, cols_x, 0, 0, dx, lddx, queue);        
+    //magmablas_dlaset(MagmaFull, rows_x, cols_x, 0, 0, dx, lddx, queue);        
+
+    // Dummy x for testing
+    double x[4] = {5, 4, 3, 2};    
+    magma_setmatrix(rows_x, cols_x, sizeof(double), x, lddx, dx, lddx, queue); 
+    magma_dprint_gpu(rows_x, cols_x, dx, lddx, queue);
 
     /********************
     * Print for testing *
@@ -122,9 +127,23 @@ int main(int argc, char *argv[])
     magma_int_t iter;
     magma_int_t r;
 
+    double residual;
+    double dotp;
+
+    /****************************
+    * Allocate row on CPU & GPU *
+    ****************************/
     double *row;
     magma_dmalloc_cpu(&row, rows_AT * sizeof(double));
     
+    magma_int_t rows_row = 1;
+    magma_int_t cols_row = cols_A;
+    magma_int_t ldrow = rows_row;      // Leading dim is 1, because only 1 row
+
+    double *drow;
+    magma_int_t lddrow = ldrow;
+    magma_dmalloc(&drow, lddrow * cols_row);
+
     for(iter; iter < iterations; iter++)
     {
         for(r; r < rows_A; r++)
@@ -133,11 +152,30 @@ int main(int argc, char *argv[])
             * Grab a row and take the 2 norm of it *
             ***************************************/
             memcpy(row, &AT[r * cols_A], cols_A * sizeof(double));
-            magma_dprint(1, cols_A, row, 1);
+            magma_dprint(1, cols_row, row, ldrow);
     
             double norm;
             norm = pow(magma_cblas_dnrm2(cols_A, row, 1), 2);
             cout << "Norm: " << norm << endl;
+
+            if(norm > 0)
+            {
+                /*************************
+                * Calculate the residual *
+                *************************/
+                cout << "----------------------------" << endl;
+                cout << "Copying vector" << endl;
+                magma_setvector(cols_A, sizeof(double), row, 1, drow, 1, queue);
+                magma_dprint_gpu(rows_row, cols_row, drow, lddrow, queue);
+
+                cout << "Calculate dot product" << endl;
+                dotp = magma_ddot(4, drow, 1, dx, 1, queue);
+                cout << dotp << endl;
+            
+                residual = b[r] - dotp;
+                cout << "residual: " << residual << endl; 
+                cout << "----------------------------" << endl;
+            }
         }
     }
     
@@ -147,6 +185,7 @@ int main(int argc, char *argv[])
     magma_free(dA);
     magma_free(dAT);
     magma_free(dx);
+    magma_free(drow);
     magma_free_cpu(row);
     magma_free_cpu(A);
     magma_free_cpu(AT);

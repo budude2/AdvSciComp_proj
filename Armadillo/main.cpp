@@ -1,14 +1,18 @@
 #include <iostream>
 #include <armadillo>
 #include "support.h"
+#include <chrono>
 
 using namespace std;
 using namespace arma;
+using namespace std::chrono;
 
 //test A-filename, rows, cols, b-filename, rows, imsize, iterations, relax
 //0    1           2     3     4           5     6       7           8
 int main(int argc, char *argv[])
 {
+    auto prog_start = high_resolution_clock::now();
+
     unsigned long rows_a = strtoul(argv[2], nullptr, 10);
     unsigned long cols_a = strtoul(argv[3], nullptr, 10);
 
@@ -41,9 +45,26 @@ int main(int argc, char *argv[])
 
     b.load(argv[4]);
 
+    auto setup_finish = high_resolution_clock::now();
+
     ART(A, b, x0, iterations, relax, x);
 
+    auto ART_finish = high_resolution_clock::now();
+
     x.save("x.bin", raw_binary);
+
+    auto datawrite_finish = high_resolution_clock::now();
+
+    auto setupTime      = duration_cast<milliseconds>(setup_finish - prog_start);
+    auto artTime        = duration_cast<milliseconds>(ART_finish - setup_finish);
+    auto datawriteTime  = duration_cast<microseconds>(datawrite_finish - ART_finish);
+    auto totalTime      = duration_cast<milliseconds>(datawrite_finish - prog_start);
+
+    cout << "Setup time:      " << setupTime.count()        << " mS" << endl;
+    cout << "ART time:        " << artTime.count()          << " mS" << endl;
+    cout << "Data Write time: " << datawriteTime.count()    << " uS" << endl;
+    cout << "Total time:      " << totalTime.count()        << " mS" << endl;
+    cout << endl;
 
 	return 0;
 }

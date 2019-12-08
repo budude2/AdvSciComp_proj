@@ -64,6 +64,11 @@ int main(int argc, char *argv[])
     magma_int_t lddA = ldA;
     magma_dmalloc(&dA, lddA * cols_A);
 
+    if(dA == nullptr)
+    {
+        cerr << "Couldn't allocate dA" << endl;
+    }
+
     /*****************************
     * Setup the AT matrix on CPU *
     *****************************/
@@ -80,6 +85,11 @@ int main(int argc, char *argv[])
     double *dAT;
     magma_int_t lddAT = ldAT;
     magma_dmalloc(&dAT, lddAT * cols_AT);
+
+    if(dAT == nullptr)
+    {
+        cerr << "Couldn't allocate dAT" << endl;
+    }
 
     /****************************
     * Setup the b matrix on CPU *
@@ -228,13 +238,13 @@ int main(int argc, char *argv[])
 
     auto setupTime      = duration_cast<milliseconds>(setup_finish - prog_start);
     auto artTime        = duration_cast<milliseconds>(ART_finish - setup_finish);
-    auto cleanupTime    = duration_cast<microseconds>(dwrite_cleanup - ART_finish);
+    auto cleanupTime    = duration_cast<milliseconds>(dwrite_cleanup - ART_finish);
     auto totalTime      = duration_cast<milliseconds>(dwrite_cleanup - prog_start);
 
     cout << "----------------------------------------" << endl;
     cout << "Setup time:                " << setupTime.count()      << " mS" << endl;
     cout << "ART time:                  " << artTime.count()        << " mS" << endl;
-    cout << "Data Write & Cleanup time: " << cleanupTime.count()    << " uS" << endl;
+    cout << "Data Write & Cleanup time: " << cleanupTime.count()    << " mS" << endl;
     cout << "Total time:                " << totalTime.count()      << " mS" << endl;
     cout << "----------------------------------------" << endl;
 

@@ -75,11 +75,11 @@ int main(int argc, char *argv[])
 
     double *dx = nullptr;
     magma_dmalloc(&dx, lddx * cols_x);
-    magmablas_dlaset(MagmaFull, rows_x, cols_x, 0, 0, dx, lddx, queue);        
+    magmablas_dlaset(MagmaFull, rows_x, cols_x, 0, 0, dx, lddx, queue);
 
     // Dummy x for testing
-    //double x[4] = {5, 4, 3, 2};    
-    //magma_setmatrix(rows_x, cols_x, sizeof(double), x, lddx, dx, lddx, queue); 
+    //double x[4] = {5, 4, 3, 2};
+    //magma_setmatrix(rows_x, cols_x, sizeof(double), x, lddx, dx, lddx, queue);
     //cout << "Initial x: " << endl;
     //magma_dprint_gpu(rows_x, cols_x, dx, lddx, queue);
 
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     ****************************/
     double *row;
     magma_dmalloc_cpu(&row, cols_A * sizeof(double)); // Was rows_AT
-    
+
     magma_int_t rows_row    = 1;
     magma_int_t cols_row    = cols_A;
     magma_int_t ldrow       = rows_row;      // Leading dim is 1, because only 1 row
@@ -120,13 +120,13 @@ int main(int argc, char *argv[])
     for(iter = 0; iter < iterations; iter++)
     {
         for(r = 0; r < rows_A; r++)
-        {    
+        {
             /***************************************
             * Grab a row and take the 2 norm of it *
             ***************************************/
             memcpy(row, &A[r * cols_A], cols_A * sizeof(double));
             //magma_dprint(1, cols_row, row, ldrow);
-    
+
             double norm;
             norm = pow(magma_cblas_dnrm2(cols_A, row, 1), 2);
             //cout << "Norm: " << norm << endl;
@@ -144,9 +144,9 @@ int main(int argc, char *argv[])
                 //cout << "Calculate dot product" << endl;
                 dotp = magma_ddot(cols_row, drow, 1, dx, 1, queue);
                 //cout << dotp << endl;
-            
+
                 residual = b[r] - dotp;
-                //cout << "residual: " << residual << endl; 
+                //cout << "residual: " << residual << endl;
                 //cout << "----------------------------" << endl;
 
                 /**********************
@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
     magma_free_cpu(b);
 
     magma_queue_destroy(queue);
-    
+
     auto dwrite_cleanup = high_resolution_clock::now();
 
     auto setupTime      = duration_cast<milliseconds>(setup_finish - prog_start);
@@ -193,5 +193,6 @@ int main(int argc, char *argv[])
     cout << "Total time:                " << totalTime.count()      << " mS" << endl;
     cout << "----------------------------------------" << endl;
 
+    magma_finalize();
     return 0;
-} 
+}
